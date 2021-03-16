@@ -1,56 +1,70 @@
+# generic stuff
+.env
 *.gem
 *.rbc
+log/*.log
 /.config
-/coverage/
 /InstalledFiles
 /pkg/
-/spec/reports/
-/spec/examples.txt
-/test/tmp/
-/test/version_tmp/
 /tmp/
 
-# Used by dotenv library to load environment variables.
-# .env
+# testy stuff
+.rspec
+.rspec_status
+*.orig
+/coverage/
+/coverage/
+/db/*.sqlite3
+/db/*.sqlite3-[0-9]*
+/db/*.sqlite3-journal
+/public/system
+/spec/examples.txt
+/spec/reports/
+/spec/tmp
+/test/tmp/
+/test/version_tmp/
+capybara-*.html
+pickle-email-*.html
+rerun.txt
+test/dummy/db/*.sqlite3
+test/dummy/db/*.sqlite3-journal
+test/dummy/log/*.log
+test/dummy/node_modules/
+test/dummy/storage/
+test/dummy/tmp/
+test/dummy/yarn-error.log
 
-# Ignore Byebug command history file.
+# debuggy stuff
 .byebug_history
 
-## Specific to RubyMotion:
-.dat*
-.repl_history
-build/
-*.bridgesupport
-build-iPhoneOS/
-build-iPhoneSimulator/
-
-## Specific to RubyMotion (use of CocoaPods):
-#
-# We recommend against adding the Pods directory to your .gitignore. However
-# you should judge for yourself, the pros and cons are mentioned at:
-# https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
-#
-# vendor/Pods/
-
-## Documentation cache and generated files:
+## doccy stuff
 /.yardoc/
 /_yardoc/
 /doc/
 /rdoc/
 
-## Environment normalization:
+## bundly stuff
 /.bundle/
 /vendor/bundle
 /lib/bundler/man/
 
-# for a library or gem, you might want to ignore these files since the code is
-# intended to run in multiple environments; otherwise, check them in:
-# Gemfile.lock
-# .ruby-version
-# .ruby-gemset
+# "for a library or gem, you might want to ignore these files since the code is
+# intended to run in multiple environments"
+Gemfile.lock
+.ruby-version
+.ruby-gemset
 
-# unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
+# rvmmy stuff
 .rvmrc
 
-# Used by RuboCop. Remote config files pulled in from inherit_from directive.
-# .rubocop-https?--*
+# editory stuff
+.idea
+.vscode
+*.rdb
+
+# systemy stuff
+*.swm
+*.swn
+*.swo
+*.swp
+*.DS_Store

@@ -1,0 +1,96 @@
+require:
+  - rubocop-performance
+  - rubocop-rspec
+  - rubocop-rake
+
+# Globals
+
+AllCops:
+  NewCops: enable
+
+# Layout
+
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - 'spec/**/*_spec.rb'
+
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+
+# Metrics
+
+Metrics/AbcSize:
+  CountRepeatedAttributes: false
+  Exclude:
+    - 'spec/**/*_spec.rb'
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*_spec.rb'
+
+Metrics/ClassLength:
+  Max: 150
+  CountComments: false
+  CountAsOne:
+    - array
+    - hash
+    - heredoc
+  Exclude:
+    - 'spec/**/*_spec.rb'
+
+Metrics/MethodLength:
+  Max: 20
+  CountComments: false
+  CountAsOne:
+    - array
+    - hash
+    - heredoc
+
+Metrics/ModuleLength:
+  Max: 150
+  CountComments: false
+  CountAsOne:
+    - array
+    - hash
+    - heredoc
+  Exclude:
+    - 'spec/**/*_spec.rb'
+
+# Rspec
+
+RSpec/ExampleLength:
+  Max: 25
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Max: 10
+
+# Style
+
+Style/DoubleNegation:
+  Enabled: false
+
+Style/ExpandPathArguments:
+  Exclude:
+    - 'adornable.gemspec'
+
+Style/StringLiterals:
+  Enabled: false
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma
