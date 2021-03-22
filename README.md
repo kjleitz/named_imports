@@ -86,8 +86,6 @@ Baz.some_str
 #=> "hi"
 ```
 
-> **Note:** Currently, non-specified constants defined in the imported file _will_ be available _after_ you've used one (or more) of the constants you specified in the import statement. Working on it!
-
 You can import multiple constants as well, by separating them with a semicolon in the `import` block:
 
 ```rb
@@ -124,7 +122,9 @@ Bop.some_hash
 - [x] multiple constant imports
 - [ ] top-level function imports
 - [x] namespace should not be polluted with non-specified constants (before the specified import is referenced/used)
-- [ ] namespace should not be polluted with non-specified constants (after the specified import is referenced/used)
+- [x] namespace should not be polluted with non-specified constants (after the specified import is referenced/used)
+- [ ] namespace of child imports should not be polluted with constants from the parent's scope
+- [ ] cached imports so constants are always reused (as opposed to being redefined in a new anonymous module)
 
 ## Development
 
