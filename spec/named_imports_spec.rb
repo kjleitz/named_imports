@@ -73,4 +73,11 @@ RSpec.describe NamedImports do
       ClassWhichUsesCodeFromMultilevelImport.child_class_method_using_parent_importer_should_error
     }.not_to raise_error
   end
+
+  it "reports the correct error when an imported module has, like, a syntax error or whatever" do
+    expect {
+      from 'support/only_imports_only_imported_by_another_import',
+        import { OnlyImportsOnlyImportedByAnotherImport }
+    }.to raise_error(SyntaxError)
+  end
 end

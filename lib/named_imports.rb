@@ -1,79 +1,101 @@
 # frozen_string_literal: true
 
 require_relative "named_imports/version"
+require_relative "named_imports/error"
 
 module NamedImports
-  class Error < StandardError; end
-
   class << self
-    def from(path, constants, context = Object)
-      path_where_import_occurs = caller(2..2).first
-      full_path = full_path_for_import(path, path_where_import_occurs)
-
-      File.open(full_path, "r") do |file|
-        file_content = file.read
-        anon_mod = Module.new
-
-        anon_mod.define_singleton_method(:from) do |path, constants|
-          NamedImports.from(path, constants, anon_mod)
-        end
-
-        anon_mod.define_singleton_method(:import) do |&block|
-          NamedImports.import(&block)
-        end
-
-        anon_mod.class_eval(file_content, full_path)
-
-        constants.each do |constant_name|
-          context.send(:remove_const, constant_name) if context.const_defined?(constant_name, false)
-          context.const_set(constant_name, anon_mod.const_get(constant_name))
-        end
-      end
+    def from(raw_path, constant_names, context = Object)
+      into_path, import_line = caller_path_and_line
+      from_path = full_path_for_import(from_path: raw_path, into_path: into_path)
+      sandbox = sandbox_eval(file_path: from_path)
+      load_constants(constant_names, from_sandbox: sandbox, into_context: context)
     end
 
-    def import(context = Object)
-      constants = []
+    def import(context = Object, &block)
+      into_path, import_line = caller_path_and_line
+      constant_names = []
 
       begin
-        yield
-      rescue NameError => e
-        raise e unless /uninitialized constant /.match?(e.message)
-
-        constant_match = e.message.match(/uninitialized constant (?:#<Module:[^>]+>::)?(\w*(?:::\w+)*)$/)
-        constant_name = constant_match && constant_match[1]
+        block.call
+      rescue => e
+        constant_name = constant_name_from_error(e)
 
         if constant_name.nil?
-          raise NameError, "unable to import constant: #{e.message.gsub(/uninitialized constant /, '')}"
+          raise NamedImports::Error::ImportBlockError.new(into_path, import_line, e)
         end
 
-        already_there = constants.include?(constant_name)
-
-        unless already_there
-          constants << constant_name
+        if !constant_names.include?(constant_name)
+          constant_names << constant_name
           context.const_set(constant_name, nil)
         end
 
         retry
       end
 
-      constants
+      constant_names
+    end
+
+    def make_named_imports_available(in_context: Object)
+      def_method = in_context == Object ? :define_method : :define_singleton_method
+
+      in_context.send(def_method, :from) do |path, constants|
+        NamedImports.from(path, constants, in_context)
+      end
+
+      in_context.send(def_method, :import) do |&block|
+        NamedImports.import(in_context, &block)
+      end
     end
 
     private
 
-    def full_path_for_import(imported_path, importer_path)
-      ext = %r{[^/]+\.[^/]+$}.match?(imported_path) ? "" : ".rb"
-      imported_path_with_ext = "#{imported_path}#{ext}"
-      importer_dir = File.dirname(importer_path)
-      File.expand_path(imported_path_with_ext, importer_dir)
+    def caller_path_and_line
+      caller_path_info = caller(3..3).first
+      caller_path_info.match(/\A(.+?):(\d+):/)[1..2]
+    end
+
+    def full_path_for_import(from_path:, into_path:)
+      ext = %r{[^/]+\.[^/]+$}.match?(from_path) ? "" : ".rb"
+      from_path_with_ext = "#{from_path}#{ext}"
+      importer_dir = File.dirname(into_path)
+      File.expand_path(from_path_with_ext, importer_dir)
+    end
+
+    def catchable_missing_constant_error?(error)
+      error.is_a?(NameError) && error.message =~ /uninitialized constant /
+    end
+
+    def constant_name_from_error(error)
+      return unless error.is_a?(NameError)
+      constant_matcher = /uninitialized constant (?:#<Module:[^>]+>::)?(\w*(?:::\w+)*)$/
+      constant_match = error.message.match(constant_matcher)
+      constant_match && constant_match[1]
+    end
+
+    def read_content(file_path:)
+      File.open(file_path, &:read)
+    end
+
+    def sandbox_eval(file_path:)
+      sandbox_module = Module.new
+      make_named_imports_available(in_context: sandbox_module)
+      ruby_code = read_content(file_path: file_path)
+      sandbox_module.class_eval(ruby_code, file_path)
+      sandbox_module
+    end
+
+    def load_constants(constant_names, from_sandbox:, into_context:)
+      constant_names.each do |constant_name|
+        if into_context.const_defined?(constant_name, false)
+          into_context.send(:remove_const, constant_name)
+        end
+
+        sandboxed_constant = from_sandbox.const_get(constant_name)
+        into_context.const_set(constant_name, sandboxed_constant)
+      end
     end
   end
 
-  Object.define_method(:from) do |path, constants|
-    NamedImports.from(path, constants)
-  end
-
-  Object.define_method(:import) do |&block|
-    NamedImports.import(&block)
-  end
+  make_named_imports_available
 end

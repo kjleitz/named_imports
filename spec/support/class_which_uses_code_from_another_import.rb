@@ -11,4 +11,3 @@ class ClassWhichUsesCodeFromAnotherImport
     ClassWhichUsesCodeFromMultilevelImport.multilevel_imported_class_method
   end
 end
-
