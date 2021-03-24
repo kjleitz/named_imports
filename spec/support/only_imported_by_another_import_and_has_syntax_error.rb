@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-class OnlyImportedByAnotherImport
+class OnlyImportedByAnotherImportAndHasSyntaxError
   def self.syntax_error; en#d
 end
