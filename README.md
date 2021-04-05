@@ -124,7 +124,7 @@ Bop.some_hash
 - [x] namespace should not be polluted with non-specified constants (before the specified import is referenced/used)
 - [x] namespace should not be polluted with non-specified constants (after the specified import is referenced/used)
 - [ ] namespace of child imports should not be polluted with constants from the parent's scope
-- [ ] cached imports so constants are always reused (as opposed to being redefined in a new anonymous module)
+- [x] cached imports so constants are always reused (as opposed to being redefined in a new anonymous module)
 
 ## Development
 

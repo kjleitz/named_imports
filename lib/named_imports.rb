@@ -4,6 +4,8 @@ require_relative "named_imports/version"
 require_relative "named_imports/error"
 
 module NamedImports
+  @@sandboxes = {}
+
   class << self
     def from(raw_path, constant_names, context = Object)
       into_path, import_line = caller_path_and_line
@@ -78,7 +80,10 @@ module NamedImports
     end
 
     def sandbox_eval(file_path:)
-      sandbox_module = Module.new
+      return @@sandboxes[file_path] if @@sandboxes[file_path]
+
+      @@sandboxes[file_path] = Module.new
+      sandbox_module = @@sandboxes[file_path]
       make_named_imports_available(in_context: sandbox_module)
       ruby_code = read_content(file_path: file_path)
       sandbox_module.class_eval(ruby_code, file_path)

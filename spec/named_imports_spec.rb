@@ -80,4 +80,42 @@ RSpec.describe NamedImports do
         import { OnlyImportsOnlyImportedByAnotherImport }
     }.to raise_error(SyntaxError)
   end
+
+  it "re-uses the same sandbox module for repeated imports from the same module" do
+    from 'support/thing_that_imports_scoops', import { ThingThatImportsScoops }
+
+    expect(ThingThatImportsScoops.scoops_class_counter).to be_zero
+    expect(ThingThatImportsScoops.scoops_class_instance_counter).to be_zero
+
+    ThingThatImportsScoops.increment_scoops_class_counter!
+
+    expect(ThingThatImportsScoops.scoops_class_counter).to eq(1)
+    expect(ThingThatImportsScoops.scoops_class_instance_counter).to eq(0)
+
+    ThingThatImportsScoops.increment_scoops_class_instance_counter!
+
+    expect(ThingThatImportsScoops.scoops_class_counter).to eq(1)
+    expect(ThingThatImportsScoops.scoops_class_instance_counter).to eq(1)
+
+    from 'support/scoops', import { Scoops }
+
+    expect(ThingThatImportsScoops.scoops_class_counter).to eq(1)
+    expect(ThingThatImportsScoops.scoops_class_instance_counter).to eq(1)
+    expect(Scoops.class_counter).to eq(1)
+    expect(Scoops.class_instance_counter).to eq(1)
+
+    Scoops.increment_class_counter!
+
+    expect(ThingThatImportsScoops.scoops_class_counter).to eq(2)
+    expect(ThingThatImportsScoops.scoops_class_instance_counter).to eq(1)
+    expect(Scoops.class_counter).to eq(2)
+    expect(Scoops.class_instance_counter).to eq(1)
+
+    Scoops.increment_class_instance_counter!
+
+    expect(ThingThatImportsScoops.scoops_class_counter).to eq(2)
+    expect(ThingThatImportsScoops.scoops_class_instance_counter).to eq(2)
+    expect(Scoops.class_counter).to eq(2)
+    expect(Scoops.class_instance_counter).to eq(2)
+  end
 end
